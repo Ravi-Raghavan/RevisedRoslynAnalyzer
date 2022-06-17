@@ -174,11 +174,22 @@ namespace roslynTester
 
 
             string finalValue = await Evaluate.evaluateFunction(functionCode, RHS.ToString(), currentValues);
+            double doubleVariableFinalValue = 0.0;
             int variableFinalValue = 0;
             bool canConvert = int.TryParse(finalValue, out variableFinalValue);
             if (canConvert)
             {
                 variableValues[variable][location] = new Value( variableFinalValue, false) ;
+            }
+            else
+            {
+                variableValues[variable][location] = new Value(sum, false);
+            }
+            canConvert = double.TryParse(finalValue, out doubleVariableFinalValue);
+            if (canConvert)
+            {
+                variableValues[variable][location] = new Value(doubleVariableFinalValue, false);
+
             }
             else
             {
@@ -311,6 +322,7 @@ namespace roslynTester
 
             string finalValue = await Evaluate.evaluateExpression(RHS.ToString(), currentValues);
             int variableFinalValue = 0;
+            double doubleVariableFinalValue = 0;
             bool canConvert = int.TryParse(finalValue, out variableFinalValue);
             if (canConvert)
             {
@@ -321,7 +333,16 @@ namespace roslynTester
             {
                 variableValues[variable][location] = new Value(sum, display);
             }
+            canConvert = double.TryParse(finalValue, out doubleVariableFinalValue);
+            if (canConvert)
+            {
+                variableValues[variable][location] = new Value(doubleVariableFinalValue, display);
 
+            }
+            else
+            {
+                variableValues[variable][location] = new Value(sum, display);
+            }
             if (variableValues[variable][location].display)
             {
                 Console.WriteLine($"Location: {location}, Message: {variable}: {variableValues[variable][location].ToString()} ");

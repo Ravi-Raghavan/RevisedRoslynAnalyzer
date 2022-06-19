@@ -14,9 +14,11 @@ using Microsoft.CodeAnalysis.CSharp.Scripting;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
+
 namespace roslynTester
 {
-    public class RoslynAnalyzer 
+    [DiagnosticAnalyzer(LanguageNames.CSharp)]
+    public class RoslynAnalyzer : DiagnosticAnalyzer
     {
         private static Dictionary<string, Dictionary<int, List<VariableLocation>>> variableDependencies = new Dictionary<string, Dictionary<int, List<VariableLocation>>>();
         private static Dictionary<string, List<int>> updates = new Dictionary<string, List<int>>();
@@ -25,7 +27,17 @@ namespace roslynTester
         private static Dictionary<string, string> functions = new Dictionary<string, string>();
         private static CSharpCompilation compilation = CSharpCompilation.Create("");
 
-        
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
+            = ImmutableArray.Create(Descriptors.variableValue);
+
+        public override void Initialize(AnalysisContext context)
+        {
+            context.EnableConcurrentExecution();
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze |
+                                                   GeneratedCodeAnalysisFlags.ReportDiagnostics);
+            context.RegisterSemanticModelAction(action: generateRoslynAnalyzer);
+
+        }
         static async Task processDeclaration(VariableDeclarationSyntax syntaxNode)
         {
             VariableDeclarationSyntax declaration = (VariableDeclarationSyntax)(syntaxNode);
@@ -200,9 +212,9 @@ namespace roslynTester
                 $"Final Type: {variableValues[variable][location].dataType}");
         }
 
-        public static async Task generateRoslynAnalyzer(string textParam = "")
+        public static void generateRoslynAnalyzer(SemanticModelAnalysisContext modelAnalysisContext)
         {
-            if (textParam == "") { textParam = CodeString.test; }
+            //if (textParam == "") { textParam = CodeString.test; }
             //Console.WriteLine(textParam);
             variableDependencies = new Dictionary<string, Dictionary<int, List<VariableLocation>>>();
             updates = new Dictionary<string, List<int>>();
@@ -210,15 +222,17 @@ namespace roslynTester
             variableValues = new Dictionary<string, Dictionary<int, Value>>();
             functions = new Dictionary<string, string>();
 
-            SyntaxTree AST = CSharpSyntaxTree.ParseText(textParam);
+            SemanticModel semanticModel = modelAnalysisContext.SemanticModel;
+            SyntaxTree AST = semanticModel.SyntaxTree;
             SyntaxNode compilationRoot = AST.GetRoot();
             CompilationUnitSyntax root = AST.GetCompilationUnitRoot();
-            compilation = CSharpCompilation.Create("HelloWorld")
+            var compilation = CSharpCompilation.Create("HelloWorld")
                 .AddReferences(MetadataReference.CreateFromFile(
                 typeof(string).Assembly.Location))
                 .AddSyntaxTrees(AST);
 
-            SemanticModel semanticModel = compilation.GetSemanticModel(AST);
+
+
             IEnumerable<SyntaxNode> descendentNodes = root.DescendantNodes();
 
             IEnumerable<MethodDeclarationSyntax> methods = descendentNodes.OfType<MethodDeclarationSyntax>();
@@ -243,40 +257,9 @@ namespace roslynTester
                 return;
             }
 
-            await roslynAnalyzerAsync(MDS);
+            roslynAnalyzerAsync(MDS);
 
-            //Dependency Printout
-            Console.WriteLine("=====Dependencies=====");
-            foreach(KeyValuePair<string, Dictionary<int, List<VariableLocation>>> kvp in variableDependencies)
-            {
-                string key = kvp.Key;
-                Dictionary<int, List<VariableLocation>> dictionary = kvp.Value;
-
-                foreach (KeyValuePair<int, List<VariableLocation>> keyValuePair in dictionary)
-                {
-                    int location = keyValuePair.Key;
-                    List<VariableLocation> dependencies = keyValuePair.Value;
-                    foreach(VariableLocation vL in dependencies)
-                    {
-                        Console.WriteLine($"Variable Name: {key}, Location: {location}, Variable Dependency: {vL.variable}, Variable Location: {vL.location}");
-                    }
-                }
-            }
-
-            //Variable Values Printout
-            Console.WriteLine("=====Variable Values=====");
-            foreach (KeyValuePair<string, Dictionary<int, Value>> kvp in variableValues)
-            {
-                string key = kvp.Key;
-                Dictionary<int, Value> dictionary = kvp.Value;
-
-                foreach (KeyValuePair<int, Value> keyValuePair in dictionary)
-                {
-                    int location = keyValuePair.Key;
-                    Value vL = keyValuePair.Value;
-                    Console.WriteLine($"Variable Name: {key}, Location: {location}, Value: {vL.value}, Type: {vL.dataType}");
-                }
-            }
+            
 
 
         }
@@ -295,6 +278,39 @@ namespace roslynTester
                 else if (syntaxNode is AssignmentExpressionSyntax)
                 {
                     await processAssignment((AssignmentExpressionSyntax)syntaxNode);
+                }
+            }
+
+            //Dependency Printout
+            Console.WriteLine("=====Dependencies=====");
+            foreach (KeyValuePair<string, Dictionary<int, List<VariableLocation>>> kvp in variableDependencies)
+            {
+                string key = kvp.Key;
+                Dictionary<int, List<VariableLocation>> dictionary = kvp.Value;
+
+                foreach (KeyValuePair<int, List<VariableLocation>> keyValuePair in dictionary)
+                {
+                    int location = keyValuePair.Key;
+                    List<VariableLocation> dependencies = keyValuePair.Value;
+                    foreach (VariableLocation vL in dependencies)
+                    {
+                        Console.WriteLine($"Variable Name: {key}, Location: {location}, Variable Dependency: {vL.variable}, Variable Location: {vL.location}");
+                    }
+                }
+            }
+
+            //Variable Values Printout
+            Console.WriteLine("=====Variable Values=====");
+            foreach (KeyValuePair<string, Dictionary<int, Value>> kvp in variableValues)
+            {
+                string key = kvp.Key;
+                Dictionary<int, Value> dictionary = kvp.Value;
+
+                foreach (KeyValuePair<int, Value> keyValuePair in dictionary)
+                {
+                    int location = keyValuePair.Key;
+                    Value vL = keyValuePair.Value;
+                    Console.WriteLine($"Variable Name: {key}, Location: {location}, Value: {vL.value}, Type: {vL.dataType}");
                 }
             }
         }

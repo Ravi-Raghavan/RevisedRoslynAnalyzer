@@ -38,6 +38,10 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "dependencies": {
+            "Microsoft.Build": {
+              "target": "Package",
+              "version": "[17.2.0, )"
+            },
             "Microsoft.CodeAnalysis": {
               "target": "Package",
               "version": "[4.2.0, )"

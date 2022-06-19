@@ -12,11 +12,13 @@
     <None Remove="MongoDB.Driver" />
     <None Remove="Microsoft.CodeAnalysis" />
     <None Remove="Microsoft.CodeAnalysis.CSharp.Scripting" />
+    <None Remove="Microsoft.Build" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MongoDB.Bson" Version="2.16.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.16.0" />
     <PackageReference Include="Microsoft.CodeAnalysis" Version="4.2.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.2.0" />
+    <PackageReference Include="Microsoft.Build" Version="17.2.0" />
   </ItemGroup>
 </Project>

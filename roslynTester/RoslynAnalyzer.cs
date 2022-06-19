@@ -122,7 +122,7 @@ namespace roslynTester
                 {
                     diagnostics[rightVariable].Add(location, new List<Diagnostic>());
                 }
-                Console.WriteLine($"Location: {location}, Message: {rightVariable}: {variableValues[rightVariable][rightLocation].ToString()}, Type: {variableValues[rightVariable][rightLocation].dataType}");
+                //Console.WriteLine($"Location: {location}, Message: {rightVariable}: {variableValues[rightVariable][rightLocation].ToString()}, Type: {variableValues[rightVariable][rightLocation].dataType}");
             }
             return functionCode;
         } 

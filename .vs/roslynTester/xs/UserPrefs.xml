@@ -1,30 +1,27 @@
 ﻿<Properties StartupConfiguration="{E4E32A06-8D62-4855-B33D-5AD6E04D65FA}|Default">
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.ItemProperties.src.roslynTester PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MultiItemStartupConfigurations />
-  <MonoDevelop.Ide.ItemProperties.src.roslynTester PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.ItemProperties.test.roslynTester.Test FirstBuild="True" />
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="roslynTester/Evaluate.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="roslynTester/RoslynAnalyzer.cs">
     <Files>
-      <File FileName="roslynTester/RoslynAnalyzer.cs" Line="39" Column="1" />
+      <File FileName="roslynTester/RoslynAnalyzer.cs" Line="125" Column="19" />
       <File FileName="roslynTester/Value.cs" Line="19" Column="18" />
       <File FileName="roslynTester/Arithmetic.cs" Line="20" Column="16" />
       <File FileName="roslynTester/Expression.cs" Line="7" Column="4" />
       <File FileName="roslynTester.Test/UnitTest1.cs" Line="8" Column="1" />
       <File FileName="roslynTester/VariableLocation.cs" Line="4" Column="12" />
       <File FileName="roslynTester/Descriptors.cs" Line="18" Column="1" />
-      <File FileName="roslynTester/Evaluate.cs" Line="1" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="roslynTester" expanded="True">
             <Node name="src" expanded="True">
-              <Node name="roslynTester" expanded="True">
-                <Node name="Evaluate.cs" selected="True" />
-              </Node>
+              <Node name="roslynTester" expanded="True" />
             </Node>
             <Node name="test" expanded="True">
               <Node name="roslynTester.Test" expanded="True" />
@@ -42,5 +39,5 @@
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MultiItemStartupConfigurations />
 </Properties>

@@ -23,8 +23,8 @@ namespace roslynTester
         static async Task Main(string[] args)
         {
 
-            await RoslynAnalyzer.generateRoslynAnalyzer();
-            //HelperTest.testRandomMethod();
+            //await RoslynAnalyzer.generateRoslynAnalyzer();
+            HelperTest.testRandomMethod();
             //RoslynAnalyzer.testRandomMethod();
             /*
             string functionString = @"

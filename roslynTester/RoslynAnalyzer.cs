@@ -9,47 +9,23 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 namespace roslynTester
 {
-	public class RoslynAnalyzer
-	{
+    public class RoslynAnalyzer 
+    {
         private static Dictionary<string, Dictionary<int, List<VariableLocation>>> variableDependencies = new Dictionary<string, Dictionary<int, List<VariableLocation>>>();
         private static Dictionary<string, List<int>> updates = new Dictionary<string, List<int>>();
         private static Dictionary<string, Dictionary<int, List<Diagnostic>>> diagnostics = new Dictionary<string, Dictionary<int, List<Diagnostic>>>();
         private static Dictionary<string, Dictionary<int, Value>> variableValues = new Dictionary<string, Dictionary<int, Value>>();
         private static Dictionary<string, string> functions = new Dictionary<string, string>();
+        private static CSharpCompilation compilation = CSharpCompilation.Create("");
+
         
-        static bool isArithmetic(ExpressionSyntax syntaxNode)
-        {
-            IEnumerable<IdentifierNameSyntax> identifiers = syntaxNode.DescendantNodes().OfType<IdentifierNameSyntax>();
-            IEnumerable<BinaryExpressionSyntax> operators = syntaxNode.DescendantNodes().OfType<BinaryExpressionSyntax>();
-            //Checking Variables
-            foreach(IdentifierNameSyntax identifier in identifiers)
-            {
-                if (!diagnostics.ContainsKey(identifier.ToString()))
-                {
-                    return false;
-                }
-            }
-
-            //Check Operators
-            foreach(BinaryExpressionSyntax binaryExpression in operators)
-            {
-                if ((binaryExpression.Kind() == SyntaxKind.AddExpression) || (binaryExpression.Kind() == SyntaxKind.SubtractExpression)
-                    || (binaryExpression.Kind() == SyntaxKind.MultiplyExpression) || (binaryExpression.Kind() == SyntaxKind.DivideExpression)) {
-
-                    continue;
-                }
-                return false;
-            }
-
-            return true;
-        }
-
         static async Task processDeclaration(VariableDeclarationSyntax syntaxNode)
         {
             VariableDeclarationSyntax declaration = (VariableDeclarationSyntax)(syntaxNode);
@@ -63,22 +39,16 @@ namespace roslynTester
                 int location = variable.GetLocation().GetLineSpan().EndLinePosition.Line;
                 IEnumerable<SyntaxNode> nestedDescendantNodes = syntaxNode.DescendantNodes();
                 IEnumerable<EqualsValueClauseSyntax> nestedAssignments = nestedDescendantNodes.OfType<EqualsValueClauseSyntax>();
-
-                if (nestedAssignments.Count() == 0)
-                {
-                    updates.Add(variableName, new List<int>());
-                    updates[variableName].Add(location);
-
-                    diagnostics.Add(variableName, new Dictionary<int, List<Diagnostic>>());
-                    diagnostics[variableName].Add(location, new List<Diagnostic>());
-                    continue;
-                }
-
+                var typeInfo = compilation.GetSemanticModel(item.SyntaxTree).GetTypeInfo(declaration.Type);
+                variableValues.Add(variableName, new Dictionary<int, Value>());
+                variableValues[variableName].Add(location, new Value(new object(), true, typeInfo.Type.ToString()));
+                diagnostics.Add(variableName, new Dictionary<int, List<Diagnostic>>());
+                diagnostics[variableName].Add(location, new List<Diagnostic>());
+                variableDependencies.Add(variableName, new Dictionary<int, List<VariableLocation>>());
+                variableDependencies[variableName].Add(location, new List<VariableLocation>());
                 foreach (var nestedAssignment in nestedAssignments)
                 {
-                    diagnostics.Add(variableName, new Dictionary<int, List<Diagnostic>>());
-                    diagnostics[variableName].Add(location, new List<Diagnostic>());
-                    if (isArithmetic(nestedAssignment.Value)) { await AnalyzeExpressionAsync(variableName, nestedAssignment.Value, location); }
+                    if (Arithmetic.isArithmetic(diagnostics, nestedAssignment.Value)) { await AnalyzeExpressionAsync(variableName, nestedAssignment.Value, location); }
                     else { await AnalyzeExpressionNonArithmeticAsync(variableName, nestedAssignment.Value, location); }
                     updates.Add(variableName, new List<int>());
                     updates[variableName].Add(location);
@@ -91,39 +61,29 @@ namespace roslynTester
             AssignmentExpressionSyntax variableAssignment = (AssignmentExpressionSyntax)(syntaxNode);
             int location = variableAssignment.GetLocation().GetLineSpan().EndLinePosition.Line;
             string variableName = variableAssignment.Left.ToString();
+            int previousLocation = updates[variableName][updates[variableName].Count - 1];
+            string dataType = variableValues[variableName][previousLocation].dataType;
+            variableValues[variableName].Add(location, new Value(new object(), true, dataType));
+            diagnostics[variableName].Add(location, new List<Diagnostic>());
+            variableDependencies[variableName].Add(location, new List<VariableLocation>());
 
-            IEnumerable<InvocationExpressionSyntax> methodInvocations = variableAssignment.DescendantNodes().OfType<InvocationExpressionSyntax>();
-
-            if (isArithmetic(syntaxNode.Right))
+            if (Arithmetic.isArithmetic(diagnostics, syntaxNode.Right))
             {
                 await AnalyzeExpressionAsync(variableName, variableAssignment.Right, location);
-
             }
             else
             {
                 await AnalyzeExpressionNonArithmeticAsync(variableName, variableAssignment.Right, location);
             }
             updates[variableName].Add(location);
-
         }
-        static async Task AnalyzeExpressionNonArithmeticAsync(string variableName, ExpressionSyntax assignment, int location)
+
+        static string getIdentifierValuesNonArithmetic(IEnumerable<IdentifierNameSyntax> identifiers,
+                                                                string variableName, int location,
+                                                                 Dictionary<string, Value> currentValues)
         {
-            ExpressionSyntax RHS = assignment;
             string variable = variableName;
-            if (!variableValues.ContainsKey(variable))
-            {
-                variableValues.Add(variable, new Dictionary<int, Value>());
-            }
-            if (!variableValues[variable].ContainsKey(location))
-            {
-                variableValues[variable].Add(location, new Value( new object(),  true));
-            }
-            IEnumerable<IdentifierNameSyntax> identifiers = RHS.DescendantNodes().OfType<IdentifierNameSyntax>();
-            int sum = 0;
             string functionCode = "";
-            bool bothSides = false;
-            int RHS_value = -1;
-            Dictionary<string, object> currentValues = new Dictionary<string, object>();
             foreach (var item in identifiers)
             {
                 IdentifierNameSyntax identifier = (IdentifierNameSyntax)(item);
@@ -134,27 +94,14 @@ namespace roslynTester
                     continue;
                 }
                 int rightLocation = updates[rightVariable][updates[rightVariable].Count - 1];
-
-                if (!variableDependencies.ContainsKey(variable))
-                {
-                    variableDependencies.Add(variable, new Dictionary<int, List<VariableLocation>>());
-                }
-                if (!variableDependencies[variable].ContainsKey(location))
-                {
-                    variableDependencies[variable].Add(location, new List<VariableLocation>());
-                }
-
                 VariableLocation obj = new VariableLocation();
                 obj.variable = rightVariable;
                 obj.location = rightLocation;
-
                 if (!currentValues.ContainsKey(rightVariable))
                 {
-                    currentValues.Add(rightVariable, (variableValues[rightVariable][rightLocation].value));
+                    currentValues.Add(rightVariable, (variableValues[rightVariable][rightLocation]));
                 }
-
                 variableDependencies[variable][location].Add(obj);
-
                 if (!diagnostics.ContainsKey(rightVariable))
                 {
                     diagnostics.Add(rightVariable, new Dictionary<int, List<Diagnostic>>());
@@ -163,133 +110,38 @@ namespace roslynTester
                 {
                     diagnostics[rightVariable].Add(location, new List<Diagnostic>());
                 }
-
-
-                if (variableValues[rightVariable][rightLocation].display)
-                {
-                    Console.WriteLine($"Location: {location}, Message: {rightVariable}: {variableValues[rightVariable][rightLocation].ToString()} ");
-                }
-
+                Console.WriteLine($"Location: {location}, Message: {rightVariable}: {variableValues[rightVariable][rightLocation].ToString()}, Type: {variableValues[rightVariable][rightLocation].dataType}");
             }
+            return functionCode;
+        } 
 
-
-            string finalValue = await Evaluate.evaluateFunction(functionCode, RHS.ToString(), currentValues);
-            double doubleVariableFinalValue = 0.0;
-            int variableFinalValue = 0;
-            bool canConvert = int.TryParse(finalValue, out variableFinalValue);
-            if (canConvert)
-            {
-                variableValues[variable][location] = new Value( variableFinalValue, false) ;
-            }
-            else
-            {
-                variableValues[variable][location] = new Value(sum, false);
-            }
-            canConvert = double.TryParse(finalValue, out doubleVariableFinalValue);
-            if (canConvert)
-            {
-                variableValues[variable][location] = new Value(doubleVariableFinalValue, false);
-
-            }
-            else
-            {
-                variableValues[variable][location] = new Value(sum, false);
-            }
-            if (variableValues[variable][location].display)
-            {
-                Console.WriteLine($"Location: {location}, Message: {variable}: {variableValues[variable][location].ToString()} ");
-            }
-        }
-
-        static async Task AnalyzeExpressionAsync(string variableName, ExpressionSyntax assignment, int location)
+        static async Task AnalyzeExpressionNonArithmeticAsync(string variableName, ExpressionSyntax assignment, int location)
         {
             ExpressionSyntax RHS = assignment;
             string variable = variableName;
-
-            if (!variableValues.ContainsKey(variable))
-            {
-                variableValues.Add(variable, new Dictionary<int, Value>());
-            }
-            if (!variableValues[variable].ContainsKey(location))
-            {
-                variableValues[variable].Add(location, new Value(new object(), true));
-            }
-
-            int numericValue = 0;
-            bool canParse = int.TryParse(RHS.ToString().Trim(), out numericValue);
-            if (canParse)
-            {
-                variableValues[variable][location] = new Value(numericValue, true);
-                Console.WriteLine($"Location: {location}, Message: {variable}: {variableValues[variable][location].ToString()} ");
-                return;
-            }
-
-            if (RHS is IdentifierNameSyntax)
-            {
-                IdentifierNameSyntax identifier = (IdentifierNameSyntax)(RHS);
-                string rightVariable = identifier.ToString();
-                int rightLocation = updates[rightVariable][updates[rightVariable].Count - 1];
-
-                if (!variableDependencies.ContainsKey(variable))
-                {
-                    variableDependencies.Add(variable, new Dictionary<int, List<VariableLocation>>());
-                }
-                if (!variableDependencies[variable].ContainsKey(location))
-                {
-                    variableDependencies[variable].Add(location, new List<VariableLocation>());
-                }
-
-                VariableLocation obj = new VariableLocation();
-                obj.variable = rightVariable;
-                obj.location = rightLocation;
-
-                variableDependencies[variable][location].Add(obj);
-
-                Value rightValue = variableValues[rightVariable][rightLocation];
-
-                variableValues[variable][location] = new Value(rightValue.value, rightValue.display);
-
-                if (!diagnostics.ContainsKey(rightVariable))
-                {
-                    diagnostics.Add(rightVariable, new Dictionary<int, List<Diagnostic>>());
-                }
-                if (!diagnostics[rightVariable].ContainsKey(location))
-                {
-                    diagnostics[rightVariable].Add(location, new List<Diagnostic>());
-                }
-
-                if (variableValues[rightVariable][rightLocation].display)
-                {
-                    Console.WriteLine($"Location: {location}, Message: {rightVariable}: {variableValues[rightVariable][rightLocation].ToString()} ");
-                }
-                
-
-                if (variableValues[variable][location].display)
-                {
-                    Console.WriteLine($"Location: {location}, Message: {variable}: {variableValues[variable][location].ToString()} ");
-                }
-                return;
-            }
-
             IEnumerable<IdentifierNameSyntax> identifiers = RHS.DescendantNodes().OfType<IdentifierNameSyntax>();
             int sum = 0;
+            string functionCode = "";
+            Dictionary<string, Value> currentValues = new Dictionary<string, Value>();
+            functionCode = getIdentifierValuesNonArithmetic(identifiers, variableName, location, currentValues);
+            string finalValue = await Evaluate.evaluateFunction(functionCode, RHS.ToString(), currentValues);
+            string dataType = variableValues[variable][location].dataType;
+            variableValues[variable][location] = new Value(finalValue, false, dataType);
+            Console.WriteLine($"Location: {location}, Message: {variable}: {variableValues[variable][location].ToString()} " +
+                $"Final Type: {variableValues[variable][location].dataType}");
+        }
+
+        static bool getIdentifierValuesArithmetic(IEnumerable<IdentifierNameSyntax> identifiers,
+                                                   Dictionary<string, Value> currentValues,
+                                                   string variable, int location)
+        {
             bool display = true;
-            Dictionary<string, object> currentValues = new Dictionary<string, object>();
             foreach (var item in identifiers)
             {
                 IdentifierNameSyntax identifier = (IdentifierNameSyntax)(item);
                 string rightVariable = identifier.ToString();
-                
-                int rightLocation = updates[rightVariable][updates[rightVariable].Count - 1];
 
-                if (!variableDependencies.ContainsKey(variable))
-                {
-                    variableDependencies.Add(variable, new Dictionary<int, List<VariableLocation>>());
-                }
-                if (!variableDependencies[variable].ContainsKey(location))
-                {
-                    variableDependencies[variable].Add(location, new List<VariableLocation>());
-                }
+                int rightLocation = updates[rightVariable][updates[rightVariable].Count - 1];
 
                 VariableLocation obj = new VariableLocation();
                 obj.variable = rightVariable;
@@ -297,9 +149,9 @@ namespace roslynTester
 
                 if (!currentValues.ContainsKey(rightVariable))
                 {
-                    currentValues.Add(rightVariable, (variableValues[rightVariable][rightLocation].value));
+                    currentValues.Add(rightVariable, (variableValues[rightVariable][rightLocation]));
                 }
-                
+
                 display = display && variableValues[rightVariable][rightLocation].display;
                 variableDependencies[variable][location].Add(obj);
 
@@ -311,43 +163,41 @@ namespace roslynTester
                 {
                     diagnostics[rightVariable].Add(location, new List<Diagnostic>());
                 }
-
-                bool printRHS = rightVariable.Equals(variable);
-                if (variableValues[rightVariable][rightLocation].display)
-                {
-                    Console.WriteLine($"Location: {location}, Message: {rightVariable}: {variableValues[rightVariable][rightLocation].ToString()} ");
-                }
-
+                Console.WriteLine($"Location: {location}, Message: {rightVariable}: {variableValues[rightVariable][rightLocation].ToString()},Type: {variableValues[rightVariable][rightLocation].dataType}");
             }
+            return display;
+        }
 
-            string finalValue = await Evaluate.evaluateExpression(RHS.ToString(), currentValues);
-            int variableFinalValue = 0;
-            double doubleVariableFinalValue = 0;
-            bool canConvert = int.TryParse(finalValue, out variableFinalValue);
-            if (canConvert)
+        static async Task AnalyzeExpressionAsync(string variableName, ExpressionSyntax assignment, int location)
+        {
+            ExpressionSyntax RHS = assignment;
+            string variable = variableName;
+            string dataType = (variableValues[variable][location].dataType);
+            int numericValue = 0;
+            bool canParse = int.TryParse(RHS.ToString().Trim(), out numericValue);
+            if (canParse)
             {
-                variableValues[variable][location] = new Value(variableFinalValue, display);
                 
+                variableValues[variable][location] = new Value(numericValue, true, dataType);
+                Console.WriteLine($"Location: {location}, Message: {variable}: {variableValues[variable][location].ToString()}, Type: {variableValues[variable][location].dataType}");
+                return;
             }
-            else
-            {
-                variableValues[variable][location] = new Value(sum, display);
-            }
-            canConvert = double.TryParse(finalValue, out doubleVariableFinalValue);
-            if (canConvert)
-            {
-                variableValues[variable][location] = new Value(doubleVariableFinalValue, display);
 
-            }
-            else
+            IEnumerable<IdentifierNameSyntax> identifiers = RHS.DescendantNodes().OfType<IdentifierNameSyntax>();
+            if(RHS is IdentifierNameSyntax)
             {
-                variableValues[variable][location] = new Value(sum, display);
+                List<IdentifierNameSyntax> identifierList = new List<IdentifierNameSyntax>();
+                identifierList.Add((IdentifierNameSyntax)(RHS));
+                identifiers = identifierList.AsEnumerable();
             }
-            if (variableValues[variable][location].display)
-            {
-                Console.WriteLine($"Location: {location}, Message: {variable}: {variableValues[variable][location].ToString()} ");
-            }
-            
+            int sum = 0;
+            bool display = true;
+            Dictionary<string, Value> currentValues = new Dictionary<string, Value>();
+            display = getIdentifierValuesArithmetic(identifiers, currentValues, variable, location);
+            string finalValue = await Evaluate.evaluateExpression(RHS.ToString(), currentValues);
+            variableValues[variable][location] = new Value(finalValue, display, dataType);
+            Console.WriteLine($"Location: {location}, Message: {variable}: {variableValues[variable][location].ToString()} " +
+                $"Final Type: {variableValues[variable][location].dataType}");
         }
 
         public static async Task generateRoslynAnalyzer(string textParam = "")
@@ -363,7 +213,7 @@ namespace roslynTester
             SyntaxTree AST = CSharpSyntaxTree.ParseText(textParam);
             SyntaxNode compilationRoot = AST.GetRoot();
             CompilationUnitSyntax root = AST.GetCompilationUnitRoot();
-            var compilation = CSharpCompilation.Create("HelloWorld")
+            compilation = CSharpCompilation.Create("HelloWorld")
                 .AddReferences(MetadataReference.CreateFromFile(
                 typeof(string).Assembly.Location))
                 .AddSyntaxTrees(AST);
@@ -424,7 +274,7 @@ namespace roslynTester
                 {
                     int location = keyValuePair.Key;
                     Value vL = keyValuePair.Value;
-                    Console.WriteLine($"Variable Name: {key}, Location: {location}, Value: {vL.value}");
+                    Console.WriteLine($"Variable Name: {key}, Location: {location}, Value: {vL.value}, Type: {vL.dataType}");
                 }
             }
 

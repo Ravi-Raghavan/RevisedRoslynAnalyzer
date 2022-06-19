@@ -5,6 +5,12 @@ VisualStudioVersion = 25.0.1700.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "roslynTester", "roslynTester\roslynTester.csproj", "{E4E32A06-8D62-4855-B33D-5AD6E04D65FA}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BF8CBA22-2133-4620-8F27-9E84732504DC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{495BC5AB-9788-41BC-8BBC-8F727937F602}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "roslynTester.Test", "roslynTester.Test\roslynTester.Test.csproj", "{E74C25F6-EEDA-4C69-B15E-B165D2A1ABF3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,11 +21,19 @@ Global
 		{E4E32A06-8D62-4855-B33D-5AD6E04D65FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4E32A06-8D62-4855-B33D-5AD6E04D65FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E4E32A06-8D62-4855-B33D-5AD6E04D65FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E74C25F6-EEDA-4C69-B15E-B165D2A1ABF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E74C25F6-EEDA-4C69-B15E-B165D2A1ABF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E74C25F6-EEDA-4C69-B15E-B165D2A1ABF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E74C25F6-EEDA-4C69-B15E-B165D2A1ABF3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D09DA6EB-DBD3-4E99-8FF0-EB21FE16D912}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E4E32A06-8D62-4855-B33D-5AD6E04D65FA} = {BF8CBA22-2133-4620-8F27-9E84732504DC}
+		{E74C25F6-EEDA-4C69-B15E-B165D2A1ABF3} = {495BC5AB-9788-41BC-8BBC-8F727937F602}
 	EndGlobalSection
 EndGlobal

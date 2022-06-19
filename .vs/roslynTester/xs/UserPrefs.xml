@@ -1,4 +1,5 @@
 ﻿<Properties StartupConfiguration="{E4E32A06-8D62-4855-B33D-5AD6E04D65FA}|Default">
   <MultiItemStartupConfigurations />
-  <MonoDevelop.Ide.ItemProperties.roslynTester FirstBuild="True" />
+  <MonoDevelop.Ide.ItemProperties.src.roslynTester PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.ItemProperties.test.roslynTester.Test FirstBuild="True" />
 </Properties>

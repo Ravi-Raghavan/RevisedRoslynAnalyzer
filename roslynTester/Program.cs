@@ -16,13 +16,7 @@ using MongoDB.Driver.Linq;
 
 namespace roslynTester
 {
-    
-    class VariableLocation
-    {
-        public int location { get; set; }
-        public string variable { get; set; }
-    }
-    class Program
+    public class Program
     {
         
         

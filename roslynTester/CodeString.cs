@@ -12,7 +12,7 @@ static int Foo(int x, int y){
 
 static void Main(string [] args)
         {
-            var x = 1 + 2;
+            var x = 1;
             var y = x * 2;
             var z = Foo(x, 1) + y;
             var w = z + y * 2 - 3 * x + (y /x);
@@ -21,6 +21,11 @@ static void Main(string [] args)
             x = y * 2 - 3 + w * y;
 
             double d = 5.4;
+
+            d = 4 + 3.4;
+
+            
+            
         }
          }   
         ";

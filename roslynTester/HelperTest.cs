@@ -92,11 +92,15 @@ namespace roslynTester
             IEnumerable<SyntaxNode> descendentNodes = root.DescendantNodes();
             foreach (SyntaxNode syntaxNode in descendentNodes)
             {
+
+             
+                /*
                 if(syntaxNode is ExpressionSyntax)
                 {
                     isArithmetic((ExpressionSyntax)syntaxNode, compilation);
                 }
-                /*
+                */
+                
                 if (syntaxNode is MethodDeclarationSyntax)
                 {
                     MethodDeclarationSyntax mds = (MethodDeclarationSyntax)(syntaxNode);
@@ -156,7 +160,7 @@ namespace roslynTester
                 {
                     Console.WriteLine(syntaxNode.Kind());
                 }
-                */
+                
             }
 
         }

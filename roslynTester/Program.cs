@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -18,37 +19,10 @@ namespace roslynTester
 {
     public class Program
     {
-        
-        
-        static async Task Main(string[] args)
+        public static async Task Main(string [] args)
         {
-
-            //await RoslynAnalyzer.generateRoslynAnalyzer();
-            HelperTest.testRandomMethod();
-            //RoslynAnalyzer.testRandomMethod();
-            /*
-            string functionString = @"
-
-                int Foo(int x){
-                    return 2 * x;
-                }
-                int x = 2;
-            ";
-
-            string expression = "Foo(x)";
-
-            string value = await Evaluate.evaluateFunction(functionString, expression);
-            Console.WriteLine(value);
-            */
-
+            RoslynAnalyzer.generateRoslynAnalyzer();
         }
-
-        
-
-        
-
-        
-
     }
 }
 

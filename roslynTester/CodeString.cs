@@ -6,10 +6,10 @@ namespace roslynTester
 
         public static readonly string testOne = @"
         public class testClass{
-            public static int Foo(int x){
+            static int Foo(int x){
                 return x + 1;
             }
-            public static void Main(string [] args){
+            static void Main(string [] args){
                 var x = 1 + 2;
                 var y = x * 2;
                 var z = Foo(x) + y;
@@ -20,12 +20,12 @@ namespace roslynTester
         }
         ";
         public static readonly string testTwo = @"
-public class testClass{
-static int Foo(int x, int y){
-            return 2 * x + y;
-        }
+        public class testClass{
+        static int Foo(int x, int y){
+                    return 2 * x + y;
+                }
 
-static void Main(string [] args)
+        static void Main(string [] args)
         {
             var x = 1;
             var y = x * 2;
@@ -34,15 +34,21 @@ static void Main(string [] args)
             y = z + x;
             y = x + x;
             x = y * 2 - 3 + w * y;
-
             double d = 5.4;
-
             d = 4 + 3.4;
-
-            
-            
         }
          }   
+        ";
+
+        public static readonly string testThree = @"
+        public class testClass{
+            static void Main(string [] args){
+                var x = 1;
+                var y = 2;
+                var z = x + y;
+                var w = x + y + x;
+            }
+        }
         ";
 
         public static readonly string testBackup = @"

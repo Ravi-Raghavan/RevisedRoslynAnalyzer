@@ -7,10 +7,10 @@ using Microsoft.CodeAnalysis;
 
 namespace roslynTester.Test;
 
-public class UnitTest1 : CSharpAnalyzerTest<RoslynAnalyzer, XUnitVerifier>
+public class UnitTest1 : CSharpAnalyzerTest<RoslynAnalyzer2, XUnitVerifier>
 {
     [Fact]
-    public void Test1()
+    public async Task Test1()
     {
         TestCode = CodeString.testOne;
 
@@ -18,39 +18,40 @@ public class UnitTest1 : CSharpAnalyzerTest<RoslynAnalyzer, XUnitVerifier>
         ExpectedDiagnostics.Add(
             new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
                 .WithMessage("Value of x is 3")
-            );
-        ExpectedDiagnostics.Add(
-            new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
-                .WithMessage("Value of x is 3")
-            );
-        ExpectedDiagnostics.Add(
-            new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
-                .WithMessage("Value of y is 6")
-            );
-        ExpectedDiagnostics.Add(
-            new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
-                .WithMessage("Value of x is 3")
-            );
-        ExpectedDiagnostics.Add(
-            new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
-                .WithMessage("Value of y is 6")
-            );
-        ExpectedDiagnostics.Add(
-            new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
-                .WithMessage("Value of x is 3")
-            );
-        ExpectedDiagnostics.Add(
-            new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
-                .WithMessage("Value of x is 3")
-            );
-        ExpectedDiagnostics.Add(
-            new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
-                .WithMessage("Value of x is 3")
-            );
-        ExpectedDiagnostics.Add(
-            new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
-                .WithMessage("Value of y is 6")
-            );
 
+            );
+        ExpectedDiagnostics.Add(
+            new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
+                .WithMessage("Value of x is 3")
+            );
+        ExpectedDiagnostics.Add(
+            new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
+                .WithMessage("Value of y is 6")
+            );
+        ExpectedDiagnostics.Add(
+            new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
+                .WithMessage("Value of x is 3")
+            );
+        ExpectedDiagnostics.Add(
+            new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
+                .WithMessage("Value of y is 6")
+            );
+        ExpectedDiagnostics.Add(
+            new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
+                .WithMessage("Value of x is 3")
+            );
+        ExpectedDiagnostics.Add(
+            new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
+                .WithMessage("Value of x is 3")
+            );
+        ExpectedDiagnostics.Add(
+            new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
+                .WithMessage("Value of x is 3")
+            );
+        ExpectedDiagnostics.Add(
+            new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
+                .WithMessage("Value of y is 6")
+            );
+        await RunAsync();
     }
 }

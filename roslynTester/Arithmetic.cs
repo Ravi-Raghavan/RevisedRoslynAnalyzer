@@ -21,6 +21,23 @@ namespace roslynTester
         {
             IEnumerable<IdentifierNameSyntax> identifiers = syntaxNode.DescendantNodes().OfType<IdentifierNameSyntax>();
             IEnumerable<BinaryExpressionSyntax> operators = syntaxNode.DescendantNodes().OfType<BinaryExpressionSyntax>();
+            IEnumerable<PostfixUnaryExpressionSyntax> unaryPostfix = syntaxNode.DescendantNodes().OfType<PostfixUnaryExpressionSyntax>();
+            IEnumerable<PrefixUnaryExpressionSyntax> unaryPrefix = syntaxNode.DescendantNodes().OfType<PrefixUnaryExpressionSyntax>();
+
+            if (syntaxNode is BinaryExpressionSyntax)
+            {
+                List<BinaryExpressionSyntax> binaryExpressions = new List<BinaryExpressionSyntax>();
+                binaryExpressions.Add((BinaryExpressionSyntax)(syntaxNode));
+                operators = binaryExpressions.AsEnumerable();
+            }
+            if(syntaxNode is PostfixUnaryExpressionSyntax || unaryPostfix.Count() > 0)
+            {
+                return false;
+            }
+            if(syntaxNode is PrefixUnaryExpressionSyntax || unaryPrefix.Count() > 0)
+            {
+                return false;
+            }
             //Checking Variables
             foreach (IdentifierNameSyntax identifier in identifiers)
             {

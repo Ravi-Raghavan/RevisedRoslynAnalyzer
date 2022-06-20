@@ -29,7 +29,7 @@ namespace roslynTester.Test
 	public class UnitTest4 : CSharpAnalyzerTest<RoslynAnalyzer2, XUnitVerifier>
 	{
 		[Fact]
-		public void Test4()
+		public async Task Test4()
 		{
 			TestCode = CodeString.testFour;
 
@@ -147,7 +147,7 @@ namespace roslynTester.Test
 				.WithArguments("d", 7.4)
 			);
 
-
+			await RunAsync();
 		}
 	}
 }

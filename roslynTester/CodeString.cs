@@ -72,27 +72,47 @@ namespace roslynTester
          }   
         ";
 
-        public static readonly string test2 = @"
+        public static readonly string testFive = @"
         public class testClass{
-        void Foo(int x){
+        static int Foo(int x){
             return x * 2;
         }
-        void Method()
+        static void Main(string [] args)
         {
             var x = 1;
-            var y = Foo(x) + 10;
-            var z = Foo(y);
+            var y = 2;
+            var z = 3;
+            var w = 4;
+            y = 3 * w - 2 * z + 4 * x;
+            x = 2 * y + 2 * x - 2 * w;
         }
 }";
 
-        public static readonly string simpleMethodStuff = @"
-
-        void Method()
-        {
-            var a = 2;
-            var b = 1;
-            var c = b + 2 % a + 2 - 3 / 4 * 2;
+        public static readonly string testSix = @"
+       public class testClass{
+            static void Main()
+            {
+                var a = 2;
+                var b = 1;
+                var c = a % b;
+                var d = ++a;
+                var e = a--;
+            }
         }
+        ";
+
+        public static readonly string testSeven = @"
+
+        public class testClass{
+
+            public static void Main(string [] args){
+                var a = 2;
+                var b = ~ a;
+                var c = b >> 2;
+                var d = c & b;
+            }
+        }
+
         ";
 
 

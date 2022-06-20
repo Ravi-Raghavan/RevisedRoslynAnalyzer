@@ -35,7 +35,7 @@ namespace roslynTester
         }
         public static void testScriptWithFunctions()
         {
-            SyntaxTree AST = CSharpSyntaxTree.ParseText(CodeString.test2);
+            SyntaxTree AST = CSharpSyntaxTree.ParseText(CodeString.testFive);
             CompilationUnitSyntax root = AST.GetCompilationUnitRoot();
             var compilation = CSharpCompilation.Create("HelloWorld")
                 .AddReferences(MetadataReference.CreateFromFile(
@@ -79,7 +79,7 @@ namespace roslynTester
 
         public static void testRandomMethod()
         {
-            SyntaxTree AST = CSharpSyntaxTree.ParseText(CodeString.simpleMethodStuff);
+            SyntaxTree AST = CSharpSyntaxTree.ParseText(CodeString.testSix);
             CompilationUnitSyntax root = AST.GetCompilationUnitRoot();
             var compilation = CSharpCompilation.Create("HelloWorld")
                 .AddReferences(MetadataReference.CreateFromFile(

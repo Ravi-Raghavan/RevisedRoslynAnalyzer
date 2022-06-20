@@ -6,68 +6,61 @@ using System;
 using Microsoft.CodeAnalysis;
 namespace roslynTester.Test
 {
-	public class UnitTest3: CSharpAnalyzerTest<RoslynAnalyzer2, XUnitVerifier>
+	/**
+	 * 
+	 * 
+
+Value of a at Location : (5,21)-(5,22) is 2
+Value of b at Location : (6,21)-(6,22) is 1
+Value of a at Location : (7,25)-(7,26) is 2
+Value of b at Location : (7,29)-(7,30) is 1
+Value of a at Location : (8,27)-(8,28) is 2
+Value of a at Location : (9,25)-(9,26) is 2
+	 */
+	public class UnitTest6 : CSharpAnalyzerTest<RoslynAnalyzer2, XUnitVerifier>
 	{
 		[Fact]
-		public async Task Test3()
-        {
-			TestCode = CodeString.testThree;
-			ExpectedDiagnostics.Add(
-			new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
-				.WithSpan(4, 21, 4, 22)
-				.WithArguments("x", 1)
-			);
-
+		public async Task Test6() {
+			TestCode = CodeString.testSix;
 			ExpectedDiagnostics.Add(
 			new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
 				.WithSpan(5, 21, 5, 22)
-				.WithArguments("y", 2)
-			);
-
-			ExpectedDiagnostics.Add(
-			new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
-				.WithSpan(6, 25, 6, 26)
-				.WithArguments("x", 1)
-			);
-
-			ExpectedDiagnostics.Add(
-			new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
-				.WithSpan(6, 29, 6, 30)
-				.WithArguments("y", 2)
+				.WithArguments("a", 2)
 			);
 
 			ExpectedDiagnostics.Add(
 			new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
 				.WithSpan(6, 21, 6, 22)
-				.WithArguments("z", 3)
+				.WithArguments("b", 1)
 			);
 
 			ExpectedDiagnostics.Add(
 			new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
 				.WithSpan(7, 25, 7, 26)
-				.WithArguments("x", 1)
+				.WithArguments("a", 2)
 			);
 
 			ExpectedDiagnostics.Add(
 			new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
 				.WithSpan(7, 29, 7, 30)
-				.WithArguments("y", 2)
+				.WithArguments("b", 1)
 			);
 
 			ExpectedDiagnostics.Add(
 			new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
-				.WithSpan(7, 33, 7, 34)
-				.WithArguments("x", 1)
+				.WithSpan(8, 27, 8, 28)
+				.WithArguments("a", 2)
 			);
 
 			ExpectedDiagnostics.Add(
 			new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
-				.WithSpan(7, 21, 7, 22)
-				.WithArguments("w", 4)
+				.WithSpan(9, 25, 9, 26)
+				.WithArguments("a", 2)
 			);
-
 			await RunAsync();
+
 		}
+
 	}
 }
 

@@ -14,47 +14,56 @@ namespace roslynTester.Test
 			TestCode = CodeString.testThree;
 			ExpectedDiagnostics.Add(
 			new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
-				.WithMessage("Value of x is 1")
+				.WithSpan(4, 21, 4, 22)
+				.WithArguments("x", 1)
 			);
 
 			ExpectedDiagnostics.Add(
 			new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
-				.WithMessage("Value of y is 2")
+				.WithSpan(5, 21, 5, 22)
+				.WithArguments("y", 2)
 			);
 
 			ExpectedDiagnostics.Add(
 			new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
-				.WithMessage("Value of x is 1")
+				.WithSpan(6, 25, 6, 26)
+				.WithArguments("x", 1)
 			);
 
 			ExpectedDiagnostics.Add(
 			new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
-				.WithMessage("Value of y is 2")
+				.WithSpan(6, 29, 6, 30)
+				.WithArguments("y", 2)
 			);
 
 			ExpectedDiagnostics.Add(
 			new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
-				.WithMessage("Value of z is 3")
+				.WithSpan(6, 21, 6, 22)
+				.WithArguments("z", 3)
 			);
 
 			ExpectedDiagnostics.Add(
 			new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
-				.WithMessage("Value of x is 1")
+				.WithSpan(7, 25, 7, 26)
+				.WithArguments("x", 1)
 			);
 
 			ExpectedDiagnostics.Add(
 			new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
-				.WithMessage("Value of y is 2")
+				.WithSpan(7, 29, 7, 30)
+				.WithArguments("y", 2)
 			);
 
 			ExpectedDiagnostics.Add(
 			new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
-				.WithMessage("Value of x is 1")
+				.WithSpan(7, 33, 7, 34)
+				.WithArguments("x", 1)
 			);
 
 			ExpectedDiagnostics.Add(
 			new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
-				.WithMessage("Value of w is 4")
+				.WithSpan(7, 21, 7, 22)
+				.WithArguments("w", 4)
 			);
 		}
 	}

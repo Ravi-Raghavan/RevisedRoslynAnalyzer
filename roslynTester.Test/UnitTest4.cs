@@ -26,12 +26,12 @@ Value of d at Location : (17,13)-(17,14) is 7.4	D
  */
 namespace roslynTester.Test
 {
-	public class UnitTest2: CSharpAnalyzerTest<RoslynAnalyzer2, XUnitVerifier>
+	public class UnitTest4 : CSharpAnalyzerTest<RoslynAnalyzer2, XUnitVerifier>
 	{
 		[Fact]
-		public void Test2()
-        {
-			TestCode = CodeString.testTwo;
+		public void Test4()
+		{
+			TestCode = CodeString.testFour;
 
 			ExpectedDiagnostics.Add(
 			new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
@@ -53,13 +53,25 @@ namespace roslynTester.Test
 
 			ExpectedDiagnostics.Add(
 			new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
-				.WithSpan(11, 24, 11, 26)
+				.WithSpan(11, 25, 11, 26)
 				.WithArguments("x", 1)
 			);
 
 			ExpectedDiagnostics.Add(
 			new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
-				.WithSpan(11, 33, 11, 34)
+				.WithSpan(11, 28, 11, 29)
+				.WithArguments("y", 2)
+			);
+
+			ExpectedDiagnostics.Add(
+			new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
+				.WithSpan(11, 31, 11, 32)
+				.WithArguments("x", 1)
+			);
+
+			ExpectedDiagnostics.Add(
+			new DiagnosticResult(Descriptors.variableValue.Id, DiagnosticSeverity.Info)
+				.WithSpan(11, 36, 11, 37)
 				.WithArguments("y", 2)
 			);
 

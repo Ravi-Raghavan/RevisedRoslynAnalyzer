@@ -19,6 +19,15 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="1.1.1" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Testing.Verifiers.XUnit" Version="1.1.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\roslynTester\roslynTester.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" />
+    <None Remove="Microsoft.CodeAnalysis.Testing.Verifiers.XUnit" />
+  </ItemGroup>
 </Project>

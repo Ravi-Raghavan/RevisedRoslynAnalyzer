@@ -10,7 +10,7 @@ namespace roslynTester
         public static readonly DiagnosticDescriptor variableValue = new(
             id: "PG0002",
             title: "variableValue",
-            messageFormat: "{0}",
+            messageFormat: "Value of {0} is {1}",
             category: "Naming",
             defaultSeverity: DiagnosticSeverity.Info,
             isEnabledByDefault: true

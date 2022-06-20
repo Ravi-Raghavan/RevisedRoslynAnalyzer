@@ -26,7 +26,7 @@ namespace roslynTester
         private static Dictionary<string, Dictionary<int, Value>> variableValues = new Dictionary<string, Dictionary<int, Value>>();
         private static Dictionary<string, string> functions = new Dictionary<string, string>();
         private static CSharpCompilation compilation = CSharpCompilation.Create("");
-
+        private static SemanticModelAnalysisContext semanticModelAnalysisContext = new SemanticModelAnalysisContext();
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
             = ImmutableArray.Create(Descriptors.variableValue);
 
@@ -51,6 +51,7 @@ namespace roslynTester
                 int location = variable.GetLocation().GetLineSpan().EndLinePosition.Line;
                 IEnumerable<SyntaxNode> nestedDescendantNodes = syntaxNode.DescendantNodes();
                 IEnumerable<EqualsValueClauseSyntax> nestedAssignments = nestedDescendantNodes.OfType<EqualsValueClauseSyntax>();
+                AssignmentExpressionSyntax assignment = nestedDescendantNodes.OfType<AssignmentExpressionSyntax>().First();
                 var typeInfo = compilation.GetSemanticModel(item.SyntaxTree).GetTypeInfo(declaration.Type);
                 variableValues.Add(variableName, new Dictionary<int, Value>());
                 variableValues[variableName].Add(location, new Value(new object(), true, typeInfo.Type.ToString()));
@@ -60,8 +61,9 @@ namespace roslynTester
                 variableDependencies[variableName].Add(location, new List<VariableLocation>());
                 foreach (var nestedAssignment in nestedAssignments)
                 {
-                    if (Arithmetic.isArithmetic(diagnostics, nestedAssignment.Value)) { await AnalyzeExpressionAsync(variableName, nestedAssignment.Value, location); }
-                    else { await AnalyzeExpressionNonArithmeticAsync(variableName, nestedAssignment.Value, location); }
+                    if (Arithmetic.isArithmetic(diagnostics, nestedAssignment.Value)) { await AnalyzeExpressionAsync(variableName, assignment.Left,
+                                                                                            nestedAssignment.Value, location); }
+                    else { await AnalyzeExpressionNonArithmeticAsync(variableName, assignment.Left, nestedAssignment.Value, location); }
                     updates.Add(variableName, new List<int>());
                     updates[variableName].Add(location);
                 }
@@ -81,11 +83,11 @@ namespace roslynTester
 
             if (Arithmetic.isArithmetic(diagnostics, syntaxNode.Right))
             {
-                await AnalyzeExpressionAsync(variableName, variableAssignment.Right, location);
+                await AnalyzeExpressionAsync(variableName, variableAssignment.Left, variableAssignment.Right, location);
             }
             else
             {
-                await AnalyzeExpressionNonArithmeticAsync(variableName, variableAssignment.Right, location);
+                await AnalyzeExpressionNonArithmeticAsync(variableName, variableAssignment.Left, variableAssignment.Right, location);
             }
             updates[variableName].Add(location);
         }
@@ -96,6 +98,7 @@ namespace roslynTester
         {
             string variable = variableName;
             string functionCode = "";
+            string[] messageArray = new string[2];
             foreach (var item in identifiers)
             {
                 IdentifierNameSyntax identifier = (IdentifierNameSyntax)(item);
@@ -123,11 +126,25 @@ namespace roslynTester
                     diagnostics[rightVariable].Add(location, new List<Diagnostic>());
                 }
                 //Console.WriteLine($"Location: {location}, Message: {rightVariable}: {variableValues[rightVariable][rightLocation].ToString()}, Type: {variableValues[rightVariable][rightLocation].dataType}");
+                messageArray[0] = rightVariable;
+                messageArray[1] = variableValues[rightVariable][rightLocation].ToString();
+                if(messageArray[1] != "")
+                {
+                    semanticModelAnalysisContext.ReportDiagnostic(
+                        Diagnostic.Create(
+                            Descriptors.variableValue,
+                            location: identifier.GetLocation(),
+                            messageArgs: messageArray
+                            )
+                        );
+                }
+                
             }
             return functionCode;
         } 
 
-        static async Task AnalyzeExpressionNonArithmeticAsync(string variableName, ExpressionSyntax assignment, int location)
+        static async Task AnalyzeExpressionNonArithmeticAsync(string variableName, ExpressionSyntax LHS,
+                                                            ExpressionSyntax assignment, int location)
         {
             ExpressionSyntax RHS = assignment;
             string variable = variableName;
@@ -139,8 +156,21 @@ namespace roslynTester
             string finalValue = await Evaluate.evaluateFunction(functionCode, RHS.ToString(), currentValues);
             string dataType = variableValues[variable][location].dataType;
             variableValues[variable][location] = new Value(finalValue, false, dataType);
-            Console.WriteLine($"Location: {location}, Message: {variable}: {variableValues[variable][location].ToString()} " +
-                $"Final Type: {variableValues[variable][location].dataType}");
+            //Console.WriteLine($"Location: {location}, Message: {variable}: {variableValues[variable][location].ToString()} " +
+            //    $"Final Type: {variableValues[variable][location].dataType}");
+            string[] messageArray = new string[2];
+            messageArray[0] = variable;
+            messageArray[1] = variableValues[variable][location].ToString();
+            if (messageArray[1] != "")
+            {
+                semanticModelAnalysisContext.ReportDiagnostic(
+                    Diagnostic.Create(
+                        Descriptors.variableValue,
+                        location: LHS.GetLocation(),
+                        messageArgs: messageArray
+                        )
+                    );
+            }
         }
 
         static bool getIdentifierValuesArithmetic(IEnumerable<IdentifierNameSyntax> identifiers,
@@ -148,6 +178,7 @@ namespace roslynTester
                                                    string variable, int location)
         {
             bool display = true;
+            string[] messageArray = new string[2];
             foreach (var item in identifiers)
             {
                 IdentifierNameSyntax identifier = (IdentifierNameSyntax)(item);
@@ -175,23 +206,49 @@ namespace roslynTester
                 {
                     diagnostics[rightVariable].Add(location, new List<Diagnostic>());
                 }
-                Console.WriteLine($"Location: {location}, Message: {rightVariable}: {variableValues[rightVariable][rightLocation].ToString()},Type: {variableValues[rightVariable][rightLocation].dataType}");
+                //Console.WriteLine($"Location: {location}, Message: {rightVariable}: {variableValues[rightVariable][rightLocation].ToString()},Type: {variableValues[rightVariable][rightLocation].dataType}");
+                messageArray[0] = rightVariable;
+                messageArray[1] = variableValues[rightVariable][rightLocation].ToString();
+                if (messageArray[1] != "")
+                {
+                    semanticModelAnalysisContext.ReportDiagnostic(
+                        Diagnostic.Create(
+                            Descriptors.variableValue,
+                            location: identifier.GetLocation(),
+                            messageArgs: messageArray
+                            )
+                        );
+                }
             }
             return display;
         }
 
-        static async Task AnalyzeExpressionAsync(string variableName, ExpressionSyntax assignment, int location)
+        static async Task AnalyzeExpressionAsync(string variableName, ExpressionSyntax LHS,
+                                                    ExpressionSyntax assignment, int location)
         {
             ExpressionSyntax RHS = assignment;
             string variable = variableName;
             string dataType = (variableValues[variable][location].dataType);
             int numericValue = 0;
             bool canParse = int.TryParse(RHS.ToString().Trim(), out numericValue);
+            string[] messageArray = new string[2];
             if (canParse)
             {
                 
                 variableValues[variable][location] = new Value(numericValue, true, dataType);
-                Console.WriteLine($"Location: {location}, Message: {variable}: {variableValues[variable][location].ToString()}, Type: {variableValues[variable][location].dataType}");
+                //Console.WriteLine($"Location: {location}, Message: {variable}: {variableValues[variable][location].ToString()}, Type: {variableValues[variable][location].dataType}");
+                messageArray[0] = variable;
+                messageArray[1] = variableValues[variable][location].ToString();
+                if (messageArray[1] != "")
+                {
+                    semanticModelAnalysisContext.ReportDiagnostic(
+                        Diagnostic.Create(
+                            Descriptors.variableValue,
+                            location: LHS.GetLocation(),
+                            messageArgs: messageArray
+                            )
+                        );
+                }
                 return;
             }
 
@@ -208,8 +265,22 @@ namespace roslynTester
             display = getIdentifierValuesArithmetic(identifiers, currentValues, variable, location);
             string finalValue = await Evaluate.evaluateExpression(RHS.ToString(), currentValues);
             variableValues[variable][location] = new Value(finalValue, display, dataType);
-            Console.WriteLine($"Location: {location}, Message: {variable}: {variableValues[variable][location].ToString()} " +
-                $"Final Type: {variableValues[variable][location].dataType}");
+            //Console.WriteLine($"Location: {location}, Message: {variable}: {variableValues[variable][location].ToString()} " +
+            //    $"Final Type: {variableValues[variable][location].dataType}");
+
+            messageArray[0] = variable;
+            messageArray[1] = variableValues[variable][location].ToString();
+            if (messageArray[1] != "")
+            {
+                semanticModelAnalysisContext.ReportDiagnostic(
+                    Diagnostic.Create(
+                        Descriptors.variableValue,
+                        location: LHS.GetLocation(),
+                        messageArgs: messageArray
+                        )
+                    );
+            }
+
         }
 
         public static void generateRoslynAnalyzer(SemanticModelAnalysisContext modelAnalysisContext)
@@ -221,6 +292,7 @@ namespace roslynTester
             diagnostics = new Dictionary<string, Dictionary<int, List<Diagnostic>>>();
             variableValues = new Dictionary<string, Dictionary<int, Value>>();
             functions = new Dictionary<string, string>();
+            semanticModelAnalysisContext = modelAnalysisContext;
 
             SemanticModel semanticModel = modelAnalysisContext.SemanticModel;
             SyntaxTree AST = semanticModel.SyntaxTree;
@@ -280,7 +352,7 @@ namespace roslynTester
                     await processAssignment((AssignmentExpressionSyntax)syntaxNode);
                 }
             }
-
+            /*
             //Dependency Printout
             Console.WriteLine("=====Dependencies=====");
             foreach (KeyValuePair<string, Dictionary<int, List<VariableLocation>>> kvp in variableDependencies)
@@ -313,6 +385,7 @@ namespace roslynTester
                     Console.WriteLine($"Variable Name: {key}, Location: {location}, Value: {vL.value}, Type: {vL.dataType}");
                 }
             }
+            */
         }
     }
 }

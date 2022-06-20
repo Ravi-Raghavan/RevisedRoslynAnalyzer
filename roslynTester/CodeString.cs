@@ -4,7 +4,22 @@ namespace roslynTester
 	public static class CodeString
 	{
 
-        public static readonly string test = @"
+        public static readonly string testOne = @"
+        public class testClass{
+            public static int Foo(int x){
+                return x + 1;
+            }
+            public static void Main(string [] args){
+                var x = 1 + 2;
+                var y = x * 2;
+                var z = Foo(x) + y;
+                y = z + x;
+                y = x + x;
+            }
+
+        }
+        ";
+        public static readonly string testTwo = @"
 public class testClass{
 static int Foo(int x, int y){
             return 2 * x + y;

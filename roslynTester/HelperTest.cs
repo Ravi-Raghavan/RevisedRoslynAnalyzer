@@ -147,6 +147,7 @@ namespace roslynTester
                     Console.WriteLine("----------------");
                     Console.WriteLine(syntaxNode.Kind());
                     Console.WriteLine(syntaxNode);
+                    Console.WriteLine(((VariableDeclaratorSyntax)(syntaxNode)).Identifier);
                     Console.WriteLine("----------------");
                 }
                 else if (syntaxNode is InvocationExpressionSyntax)

@@ -97,7 +97,6 @@ namespace roslynTester
         static async Task AnalyzeDeclarationAsync(string variableName, SyntaxToken LHS,
                                                     ExpressionSyntax assignment, int location)
         {
-            string[] messageArray = new string[2];
             ExpressionSyntax RHS = assignment;
             string variable = variableName;
             string dataType = (variableValues[variable][location].dataType);
@@ -116,6 +115,7 @@ namespace roslynTester
             display = getIdentifierValuesArithmetic(identifiers, currentValues, variable, location);
             string finalValue = await Evaluate.evaluateExpression(RHS.ToString(), currentValues);
             variableValues[variable][location] = new Value(finalValue, display, dataType);
+            string[] messageArray = new string[2];
             messageArray[0] = variable;
             messageArray[1] = variableValues[variable][location].ToString();
             if (display)
@@ -127,6 +127,7 @@ namespace roslynTester
                         messageArgs: messageArray
                         )
                     );
+                //Console.WriteLine($"Value of {messageArray[0]} at Location {LHS.GetLocation().GetLineSpan()} is {messageArray[1]}");
             }
         }
 
@@ -159,7 +160,6 @@ namespace roslynTester
         {
             string variable = variableName;
             string functionCode = "";
-            string[] messageArray = new string[2];
             foreach (var item in identifiers)
             {
                 IdentifierNameSyntax identifier = (IdentifierNameSyntax)(item);
@@ -178,17 +178,20 @@ namespace roslynTester
                     currentValues.Add(rightVariable, (variableValues[rightVariable][rightLocation]));
                 }
                 variableDependencies[variable][location].Add(obj);
+                string[] messageArray = new string[2];
                 messageArray[0] = rightVariable;
                 messageArray[1] = variableValues[rightVariable][rightLocation].ToString();
+                Location itemLocation = identifier.GetLocation();
                 if (variableValues[rightVariable][rightLocation].display)
                 {
                     semanticModelAnalysisContext.ReportDiagnostic(
                         Diagnostic.Create(
                             Descriptors.variableValue,
-                            location: identifier.GetLocation(),
+                            location: itemLocation,
                             messageArgs: messageArray
                             )
                         );
+                    //Console.WriteLine($"Value of {messageArray[0]} at Location {identifier.GetLocation().GetLineSpan()} is {messageArray[1]}");
                 }
             }
             return functionCode;
@@ -214,7 +217,6 @@ namespace roslynTester
                                                    string variable, int location)
         {
             bool display = true;
-            string[] messageArray = new string[2];
             foreach (var item in identifiers)
             {
                 IdentifierNameSyntax identifier = (IdentifierNameSyntax)(item);
@@ -231,6 +233,7 @@ namespace roslynTester
 
                 display = display && variableValues[rightVariable][rightLocation].display;
                 variableDependencies[variable][location].Add(obj);
+                string[] messageArray = new string[2];
                 messageArray[0] = rightVariable;
                 messageArray[1] = variableValues[rightVariable][rightLocation].ToString();
                 if (variableValues[rightVariable][rightLocation].display)
@@ -242,6 +245,7 @@ namespace roslynTester
                             messageArgs: messageArray
                             )
                         );
+                    //Console.WriteLine($"Value of {messageArray[0]} at Location {identifier.GetLocation().GetLineSpan()} is {messageArray[1]}");
                 }
             }
             return display;
@@ -250,7 +254,6 @@ namespace roslynTester
         static async Task AnalyzeExpressionAsync(string variableName, ExpressionSyntax LHS,
                                                     ExpressionSyntax assignment, int location)
         {
-            string[] messageArray = new string[2];
             ExpressionSyntax RHS = assignment;
             string variable = variableName;
             string dataType = (variableValues[variable][location].dataType);
@@ -269,6 +272,7 @@ namespace roslynTester
             display = getIdentifierValuesArithmetic(identifiers, currentValues, variable, location);
             string finalValue = await Evaluate.evaluateExpression(RHS.ToString(), currentValues);
             variableValues[variable][location] = new Value(finalValue, display, dataType);
+            string[] messageArray = new string[2];
             messageArray[0] = variable;
             messageArray[1] = variableValues[variable][location].ToString();
             if (display)
@@ -280,11 +284,13 @@ namespace roslynTester
                         messageArgs: messageArray
                         )
                     );
+                //Console.WriteLine($"Value of {messageArray[0]} at Location {LHS.GetLocation().GetLineSpan()} is {messageArray[1]}");
             }
         }
 
         public static void generateRoslynAnalyzer(SemanticModelAnalysisContext modelAnalysisContext)
         {
+            /*SemanticModelAnalysisContext modelAnalysisContext*/
             variableDependencies = new Dictionary<string, Dictionary<int, List<VariableLocation>>>();
             updates = new Dictionary<string, List<int>>();
             diagnostics = new Dictionary<string, Dictionary<int, List<Diagnostic>>>();
@@ -294,12 +300,14 @@ namespace roslynTester
             RoslynAnalyzer2.semanticModel = modelAnalysisContext.SemanticModel;
 
             SyntaxTree AST = semanticModel.SyntaxTree;
+            //SyntaxTree AST = CSharpSyntaxTree.ParseText(CodeString.testOne);
             SyntaxNode compilationRoot = AST.GetRoot();
             CompilationUnitSyntax root = AST.GetCompilationUnitRoot();
             compilation = CSharpCompilation.Create("HelloWorld")
                 .AddReferences(MetadataReference.CreateFromFile(
                 typeof(string).Assembly.Location))
                 .AddSyntaxTrees(AST);
+            //semanticModel = compilation.GetSemanticModel(AST);
 
             IEnumerable<SyntaxNode> descendentNodes = root.DescendantNodes();
             IEnumerable<MethodDeclarationSyntax> methods = descendentNodes.OfType<MethodDeclarationSyntax>();

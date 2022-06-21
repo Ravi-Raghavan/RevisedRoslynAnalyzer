@@ -297,7 +297,7 @@ namespace roslynTester
             //RoslynAnalyzer.semanticModel = modelAnalysisContext.SemanticModel;
 
             //SyntaxTree AST = semanticModel.SyntaxTree;
-            SyntaxTree AST = CSharpSyntaxTree.ParseText(CodeString.testSeven);
+            SyntaxTree AST = CSharpSyntaxTree.ParseText(CodeString.testTen);
             SyntaxNode compilationRoot = AST.GetRoot();
             CompilationUnitSyntax root = AST.GetCompilationUnitRoot();
             compilation = CSharpCompilation.Create("HelloWorld")

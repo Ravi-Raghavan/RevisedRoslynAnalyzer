@@ -4,6 +4,8 @@ namespace roslynTester
 	public static class CodeString
 	{
 
+
+        //Very basic example
         public static readonly string testOne = @"
         public class testClass{
             static int Foo(int x){
@@ -19,6 +21,8 @@ namespace roslynTester
 
         }
         ";
+
+        //Very basic example
         public static readonly string testTwo = @"
         public class testClass{
         static int Foo(int x, int y){
@@ -40,6 +44,7 @@ namespace roslynTester
          }   
         ";
 
+        //Basic example
         public static readonly string testThree = @"
         public class testClass{
             static void Main(string [] args){
@@ -51,6 +56,7 @@ namespace roslynTester
         }
         ";
 
+        //Testing double datatype as well as functions
         public static readonly string testFour = @"
         public class testClass{
         static int Foo(int x, int y, int z){
@@ -72,6 +78,7 @@ namespace roslynTester
          }   
         ";
 
+        //Testing reassignments
         public static readonly string testFive = @"
         public class testClass{
         static int Foo(int x){
@@ -88,6 +95,7 @@ namespace roslynTester
         }
 }";
 
+        //Testing unary expressions
         public static readonly string testSix = @"
        public class testClass{
             static void Main()
@@ -101,6 +109,7 @@ namespace roslynTester
         }
         ";
 
+        //Testing non-arithmetic expressions;
         public static readonly string testSeven = @"
 
         public class testClass{
@@ -115,6 +124,49 @@ namespace roslynTester
 
         ";
 
+        // Testing the case where variable reassignments are
+        //done using the same variable
+        public static readonly string testEight = @"
+        public class testClass{
+            public static void Main(string [] args){
+                var a = 2;
+                var b = 3;
+                a = a + b; 
+            }
+        }
+        ";
+
+        //Variable starting out as "arithmetic" and then
+        //being reassigned using non-arithmetic values
+        public static readonly string testNine = @"
+        public class testClass{
+            public static int Foo(int x){
+                return 2 * x;
+            }
+
+            public static void Main(string [] args){
+                var a = Foo(2);
+                var b = 10;
+                b = a + b;
+            }
+        }
+        ";
+
+
+        public static readonly string testTen = @"
+        public class testClass{
+            public static double Foo(double x){
+                return 1.5 + x;
+            }
+
+            public static void Main(string [] args){
+                double a = 2.3;
+                double b = 2.45;
+                double c = Foo(a);
+                b = 2 * a;
+            }
+        }
+        ";
 
     }
 }

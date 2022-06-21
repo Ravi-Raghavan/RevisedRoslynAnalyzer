@@ -11,6 +11,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{495BC5AB-9
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "roslynTester.Test", "roslynTester.Test\roslynTester.Test.csproj", "{E74C25F6-EEDA-4C69-B15E-B165D2A1ABF3}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{958B04E7-C475-4B7D-8D16-01AE0C931C7E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleAssembly", "ExampleAssembly\ExampleAssembly.csproj", "{B11FF130-9D6A-4760-BF1B-35FBEBDC36E7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +29,10 @@ Global
 		{E74C25F6-EEDA-4C69-B15E-B165D2A1ABF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E74C25F6-EEDA-4C69-B15E-B165D2A1ABF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E74C25F6-EEDA-4C69-B15E-B165D2A1ABF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B11FF130-9D6A-4760-BF1B-35FBEBDC36E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B11FF130-9D6A-4760-BF1B-35FBEBDC36E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B11FF130-9D6A-4760-BF1B-35FBEBDC36E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B11FF130-9D6A-4760-BF1B-35FBEBDC36E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -35,5 +43,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{E4E32A06-8D62-4855-B33D-5AD6E04D65FA} = {BF8CBA22-2133-4620-8F27-9E84732504DC}
 		{E74C25F6-EEDA-4C69-B15E-B165D2A1ABF3} = {495BC5AB-9788-41BC-8BBC-8F727937F602}
+		{B11FF130-9D6A-4760-BF1B-35FBEBDC36E7} = {958B04E7-C475-4B7D-8D16-01AE0C931C7E}
 	EndGlobalSection
 EndGlobal

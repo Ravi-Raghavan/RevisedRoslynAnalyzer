@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>RoslynAnalyzer</id>
+    <version>1.0.0</version>
+    <authors>Ravi Raghavan</authors>
+    <description>Roslyn Analyzer</description>
+    <tags>tag1, tag2, tag3</tags>
+    <dependencies>
+      <group targetFramework="net6.0">
+        <dependency id="Microsoft.Build" version="17.2.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.CodeAnalysis" version="4.2.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.CodeAnalysis.CSharp.Scripting" version="4.2.0" exclude="Build,Analyzers" />
+        <dependency id="MongoDB.Bson" version="2.16.0" exclude="Build,Analyzers" />
+        <dependency id="MongoDB.Driver" version="2.16.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

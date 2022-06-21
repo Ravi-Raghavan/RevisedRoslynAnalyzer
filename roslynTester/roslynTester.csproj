@@ -5,6 +5,19 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackageTargetFallback>portable-net45+win8+wp8+wpa81</PackageTargetFallback>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup>
+                <PackageId>RoslynAnalyzer</PackageId>
+                <PackageVersion>1.0.0.0</PackageVersion>
+                <Authors>Ravi Raghavan</Authors>
+                <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+                <Description>Roslyn Analyzer</Description>
+                <PackageTags>tag1, tag2, tag3</PackageTags>
+                <NoPackageAnalysis>true</NoPackageAnalysis>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +27,13 @@
     <None Remove="Microsoft.CodeAnalysis.CSharp.Scripting" />
     <None Remove="Microsoft.Build" />
   </ItemGroup>
+  <ItemGroup>
+                <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="2.2.0" PrivateAssets="all" />
+                <PackageReference Update="NETStandard.Library" PrivateAssets="all" />
+        </ItemGroup>
+  <ItemGroup>
+                <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="tools" />
+        </ItemGroup>  
   <ItemGroup>
     <PackageReference Include="MongoDB.Bson" Version="2.16.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.16.0" />

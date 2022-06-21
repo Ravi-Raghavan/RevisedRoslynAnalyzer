@@ -153,7 +153,7 @@ namespace roslynTester
         ";
 
 
-        //Testing with strictly double datatype
+        //Testing strictly doubles
         public static readonly string testTen = @"
         public class testClass{
             public static double Foo(double x){

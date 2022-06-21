@@ -127,7 +127,6 @@ namespace roslynTester
                         messageArgs: messageArray
                         )
                     );
-                //Console.WriteLine($"Value of {messageArray[0]} at Location {LHS.GetLocation().GetLineSpan()} is {messageArray[1]}");
             }
         }
 
@@ -191,7 +190,6 @@ namespace roslynTester
                             messageArgs: messageArray
                             )
                         );
-                    //Console.WriteLine($"Value of {messageArray[0]} at Location {identifier.GetLocation().GetLineSpan()} is {messageArray[1]}");
                 }
             }
             return functionCode;
@@ -245,7 +243,6 @@ namespace roslynTester
                             messageArgs: messageArray
                             )
                         );
-                    //Console.WriteLine($"Value of {messageArray[0]} at Location {identifier.GetLocation().GetLineSpan()} is {messageArray[1]}");
                 }
             }
             return display;
@@ -284,13 +281,11 @@ namespace roslynTester
                         messageArgs: messageArray
                         )
                     );
-                //Console.WriteLine($"Value of {messageArray[0]} at Location {LHS.GetLocation().GetLineSpan()} is {messageArray[1]}");
             }
         }
 
         public static void generateRoslynAnalyzer(SemanticModelAnalysisContext modelAnalysisContext)
         {
-            /*SemanticModelAnalysisContext modelAnalysisContext*/
             variableDependencies = new Dictionary<string, Dictionary<int, List<VariableLocation>>>();
             updates = new Dictionary<string, List<int>>();
             diagnostics = new Dictionary<string, Dictionary<int, List<Diagnostic>>>();
@@ -300,14 +295,12 @@ namespace roslynTester
             RoslynAnalyzer2.semanticModel = modelAnalysisContext.SemanticModel;
 
             SyntaxTree AST = semanticModel.SyntaxTree;
-            //SyntaxTree AST = CSharpSyntaxTree.ParseText(CodeString.testOne);
             SyntaxNode compilationRoot = AST.GetRoot();
             CompilationUnitSyntax root = AST.GetCompilationUnitRoot();
             compilation = CSharpCompilation.Create("HelloWorld")
                 .AddReferences(MetadataReference.CreateFromFile(
                 typeof(string).Assembly.Location))
                 .AddSyntaxTrees(AST);
-            //semanticModel = compilation.GetSemanticModel(AST);
 
             IEnumerable<SyntaxNode> descendentNodes = root.DescendantNodes();
             IEnumerable<MethodDeclarationSyntax> methods = descendentNodes.OfType<MethodDeclarationSyntax>();

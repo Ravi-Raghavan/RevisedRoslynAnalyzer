@@ -17,11 +17,39 @@ using MongoDB.Driver.Linq;
 
 namespace roslynTester
 {
+    class KeyObj {
+
+        private int x;
+        private int y;
+        public KeyObj(int x, int y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if(!(obj is KeyObj))
+            {
+                return false;
+            }
+            KeyObj k = (KeyObj)(obj);
+            return k.x == this.x && k.y == this.y;
+        }
+
+    }
     public class Program
     {
         public static async Task Main(string [] args)
         {
             RoslynAnalyzer.generateRoslynAnalyzer();
+
+            //Dictionary<KeyObj, int> dict = new Dictionary<KeyObj, int>();
+            //KeyObj kbj = new KeyObj(1, 2);
+            //dict.Add(kbj, 10);
+
+            //KeyObj kbj2 = new KeyObj(1, 2);
+            //Console.WriteLine(dict.ContainsKey(kbj2));
         }
     }
 }

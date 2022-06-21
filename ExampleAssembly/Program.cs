@@ -10,13 +10,16 @@ namespace roslynTester.examples
         }
         public static void Main(string [] args)
         {
-            /*
-            var x = 1 + 2;
-            var y = x * 2;
-            var z = Foo(x) + y;
-            y = z + x;
-            y = x + x;
-            */
+
+            //var x = 1 + 2;
+            //var y = x * 2;
+            //var z = Foo(x) + y;
+            //y = z + x;
+            //y = x + x;
+            //x = 10;
+            //y = x + z;
+            //int w = 1;
+            //y = x + 2 * w + 4 - x;
 
 
             //var x = 1;
@@ -34,18 +37,23 @@ namespace roslynTester.examples
             //double d = 5.4;
             //d = 4 + 3.4;
 
-            //var x = 1;
-            //var y = 2;
-            //var z = 3;
-            //var w = 4;
-            //y = 3 * w - 2 * z + 4 * x;
-            //x = 2 * y + 2 * x - 2 * w;
+            var x = 1;
+            var y = 2;
+            var z = 3;
+            var w = 4;
+            y = 3 * w - 2 * z + 4 * x + 2 * y;
+            x = 2 * y + 2 * x - 2 * w;
 
-            //var a = 2;
-            //var b = 1;
-            //var c = a % b;
-            //var d = ++a;
-            //var e = a--;
+
+
+            var a = 2;
+            var b = 1;
+            var c = a % b;
+            var d = ++a;
+            var e = a--;
+            var f = Foo(a, b, x);
+            bool g = true;
+            double h = 4.5 + a;
 
         }
     }
